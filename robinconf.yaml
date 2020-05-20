@@ -1,0 +1,16 @@
+traffic:
+  bind: :8443
+
+management:
+  bind: :8089
+  auth:
+    user: terminator
+    pass: terminator
+
+database:
+  #log_sql: true
+  host: localhost
+  port: 3306
+  username: terminator
+  password: terminator
+  database: terminator
