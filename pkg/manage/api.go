@@ -2,6 +2,7 @@ package manage
 
 import (
 	"encoding/json"
+	"github.com/realbucksavage/robin/pkg/vhosts"
 	"io/ioutil"
 	"net/http"
 
@@ -15,10 +16,10 @@ import (
 type apiHandler struct {
 	mux   *mux.Router
 	conn  *database.Connection
-	store CertEventBus
+	store vhosts.Vault
 }
 
-func newHandler(store CertEventBus, conn *database.Connection) *apiHandler {
+func newHandler(store vhosts.Vault, conn *database.Connection) *apiHandler {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/hosts", createHost(store, conn)).Methods("POST")
@@ -30,7 +31,7 @@ func (a *apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	a.mux.ServeHTTP(w, r)
 }
 
-func createHost(s CertEventBus, conn *database.Connection) http.HandlerFunc {
+func createHost(s vhosts.Vault, conn *database.Connection) http.HandlerFunc {
 
 	type request struct {
 		FQDN     string `json:"fqdn" validate:"required"`
@@ -75,12 +76,14 @@ func createHost(s CertEventBus, conn *database.Connection) http.HandlerFunc {
 		certBytes := []byte(rq.Cert)
 
 		tx := db.Begin()
-		if err := tx.Save(&types.Host{
-			FQDN:           rq.FQDN,
-			NickName:       rq.Nickname,
-			RSAKey:         keyBytes,
-			SSLCertificate: certBytes,
-			Origin:         rq.Origin,
+		if err := tx.Save(&types.Vhost{
+			FQDN:   rq.FQDN,
+			Origin: rq.Origin,
+			Cert: types.Certificate{
+				RSAKey:  keyBytes,
+				X509:    certBytes,
+				CAChain: nil,
+			},
 		}).Error; err != nil {
 			log.L.Errorf("save certificate: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -88,19 +91,23 @@ func createHost(s CertEventBus, conn *database.Connection) http.HandlerFunc {
 
 			return
 		}
+
+		if err = s.Put(rq.FQDN, vhosts.H{
+			FQDN:       rq.FQDN,
+			Origin:     rq.Origin,
+			PrivateKey: keyBytes,
+			X509Cert:   certBytes,
+		}); err != nil {
+			log.L.Errorf("update certificate store: %s", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			tx.Rollback()
+
+			return
+		}
+
 		tx.Commit()
 
 		w.WriteHeader(http.StatusCreated)
 		log.L.Infof("New certificate saved for host %s", rq.FQDN)
-
-		s.Emit(CertificateEvent{
-			Type: Add,
-			Cert: CertificateInfo{
-				HostName:   rq.FQDN,
-				Origin:     rq.Origin,
-				Cert:       certBytes,
-				PrivateKey: keyBytes,
-			},
-		})
 	}
 }

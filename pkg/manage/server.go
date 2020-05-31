@@ -2,6 +2,7 @@ package manage
 
 import (
 	"context"
+	"github.com/realbucksavage/robin/pkg/vhosts"
 	"net/http"
 	"time"
 
@@ -14,7 +15,7 @@ type Server struct {
 	ShutdownChan chan bool
 	DoneFunc     func()
 	Database     *database.Connection
-	CertEventBus    CertEventBus
+	VHostVault   vhosts.Vault
 }
 
 func (s *Server) Start() {
@@ -25,7 +26,7 @@ func (s *Server) Start() {
 
 	server := &http.Server{
 		Addr:    bindAddr,
-		Handler: newHandler(s.CertEventBus, s.Database),
+		Handler: newHandler(s.VHostVault, s.Database),
 	}
 	log.L.Infof("Management interface active on %s", bindAddr)
 

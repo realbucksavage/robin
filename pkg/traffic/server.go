@@ -3,20 +3,18 @@ package traffic
 import (
 	"context"
 	"crypto/tls"
+	"github.com/realbucksavage/robin/pkg/vhosts"
 	"net/http"
 	"time"
 
-	"github.com/realbucksavage/robin/pkg/database"
 	"github.com/realbucksavage/robin/pkg/log"
-	"github.com/realbucksavage/robin/pkg/manage"
 )
 
 type Server struct {
 	Config       Config
 	ShutdownChan chan bool
 	DoneFunc     func()
-	CertEventBus manage.CertEventBus
-	DBConnection *database.Connection
+	VHostVault   vhosts.Vault
 }
 
 func (s *Server) Start() {
@@ -26,7 +24,7 @@ func (s *Server) Start() {
 	}
 
 	tlsConfig := &tls.Config{
-		GetCertificate: getCertificateFunc(s.CertEventBus, s.DBConnection),
+		GetCertificate: getCertificateFunc(s.VHostVault),
 	}
 
 	listener, err := tls.Listen("tcp", bindAddr, tlsConfig)
@@ -34,7 +32,7 @@ func (s *Server) Start() {
 		log.L.Fatalf("create traffic listener: %s", err)
 	}
 
-	handler, err := NewProxy(s.CertEventBus, s.DBConnection)
+	handler, err := NewProxy(s.VHostVault)
 	if err != nil {
 		log.L.Fatalf("create proxy: %s", err)
 	}

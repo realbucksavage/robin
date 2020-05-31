@@ -8,7 +8,7 @@ management:
     pass: terminator
 
 database:
-  #log_sql: true
+#  log_sql: true
   host: localhost
   port: 3306
   username: terminator

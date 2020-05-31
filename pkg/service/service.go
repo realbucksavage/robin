@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/realbucksavage/robin/pkg/vhosts"
 	"os"
 	"os/signal"
 	"sync"
@@ -26,23 +27,25 @@ func cmdService(config Config) {
 	}()
 
 	if err := db.Migrate(
-		&types.Host{},
+		&types.Vhost{},
+		&types.Certificate{},
 	); err != nil {
+		log.L.Fatal(err)
+	}
+
+	vhostVault, err := vhosts.NewVault(db)
+	if err != nil {
 		log.L.Fatal(err)
 	}
 
 	shutdown := make(chan bool)
 	var wg sync.WaitGroup
 
-	bus := manage.NewBus()
-	defer bus.Close()
-
 	trafficServer := &traffic.Server{
 		Config:       config.Traffic,
 		ShutdownChan: shutdown,
 		DoneFunc:     wg.Done,
-		CertEventBus: bus,
-		DBConnection: db,
+		VHostVault:   vhostVault,
 	}
 	wg.Add(1)
 	go trafficServer.Start()
@@ -52,7 +55,7 @@ func cmdService(config Config) {
 		ShutdownChan: shutdown,
 		DoneFunc:     wg.Done,
 		Database:     db,
-		CertEventBus: bus,
+		VHostVault:   vhostVault,
 	}
 	wg.Add(1)
 	go managementServer.Start()
