@@ -3,6 +3,7 @@ module github.com/realbucksavage/robin
 go 1.14
 
 require (
+	github.com/go-kit/kit v0.10.0
 	github.com/gorilla/mux v1.7.4
 	github.com/jinzhu/gorm v1.9.12
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7

@@ -24,9 +24,13 @@ func (s *Server) Start() {
 		bindAddr = defaultBindAddr
 	}
 
+	handler, err := newHandler(s.VHostVault, s.Database)
+	if err != nil {
+		log.L.Fatalf("create handler: %s", err)
+	}
 	server := &http.Server{
 		Addr:    bindAddr,
-		Handler: newHandler(s.VHostVault, s.Database),
+		Handler: handler,
 	}
 	log.L.Infof("Management interface active on %s", bindAddr)
 
