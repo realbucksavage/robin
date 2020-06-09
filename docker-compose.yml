@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  database:
+    image: mysql:8
+    command: --lower_case_table_names=1
+    volumes:
+      - "mysql_data:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: robin
+      MYSQL_PASSWORD: robin
+      MYSQL_DATABASE: robin
+
+  application:
+    depends_on:
+      - database
+    ports:
+      - 8089:8089
+      - 443:8443
+    volumes:
+      - "./robinconf.yaml:/app/robinconf.yaml:ro"
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+
+volumes:
+  mysql_data:

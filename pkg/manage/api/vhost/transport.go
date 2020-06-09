@@ -17,6 +17,16 @@ var (
 func MakeRouter(r *mux.Router, s Service) {
 	e := MakeEndpoint(s)
 
+	r.Methods("GET").Path("/").Handler(httptransport.NewServer(
+		e.ListVhostsEndpoint,
+		decodeListVhosts,
+		encodeResponse,
+	))
+	r.Methods("DELETE").Path("/{id}").Handler(httptransport.NewServer(
+		e.DeleteVhostEndpoint,
+		decodeGetVhost,
+		encodeResponse,
+	))
 	r.Methods("GET").Path("/{id}").Handler(httptransport.NewServer(
 		e.GetVhostEndpoint,
 		decodeGetVhost,
@@ -27,6 +37,11 @@ func MakeRouter(r *mux.Router, s Service) {
 		decodePostVhost,
 		encodeResponse,
 	))
+}
+
+func decodeListVhosts(_ context.Context, r *http.Request) (interface{}, error) {
+	// stub
+	return struct{}{}, nil
 }
 
 func decodeGetVhost(_ context.Context, r *http.Request) (interface{}, error) {

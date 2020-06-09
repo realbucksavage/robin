@@ -19,7 +19,7 @@ func (v *defaultVault) Get(host string) (Record, bool) {
 	v.mu.RLock()
 	defer v.mu.RUnlock()
 
-	h, ok := v.hostCerts[host]
+	h, ok := v.hostCerts[sanitize(host)]
 	return h, ok
 }
 
@@ -56,7 +56,8 @@ func (v *defaultVault) Remove(host string) {
 	v.mu.Lock()
 	defer v.mu.Unlock()
 
-	delete(v.hostCerts, host)
+	delete(v.hostCerts, sanitize(host))
+	log.L.Infof("Certificate for host %s removed", host)
 }
 
 func (v *defaultVault) Clear() {

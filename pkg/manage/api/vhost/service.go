@@ -14,6 +14,7 @@ var (
 )
 
 type Service interface {
+	ListVhosts(ctx context.Context) ([]types.Vhost, error)
 	GetVhost(ctx context.Context, id uint) (types.Vhost, error)
 	PostVhost(ctx context.Context, v types.Vhost) (types.Vhost, error)
 	PutVhost(ctx context.Context, id uint, v types.Vhost) (types.Vhost, error)
@@ -29,10 +30,24 @@ func NewService(db *gorm.DB, vault vhosts.Vault) Service {
 	return &defaultService{db: db, vault: vault}
 }
 
+func (s *defaultService) ListVhosts(ctx context.Context) ([]types.Vhost, error) {
+	var v []types.Vhost
+	if err := s.db.Find(&v).Error; err != nil {
+		return nil, err
+	}
+
+	return v, nil
+}
+
 func (s *defaultService) GetVhost(ctx context.Context, id uint) (types.Vhost, error) {
 	var v types.Vhost
-	if err := s.db.Preload("Cert").First(&v, id).Error; err != nil {
-		return types.Vhost{}, err
+	err := s.db.Preload("Cert").First(&v, id).Error
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return types.Vhost{}, ErrNotFound
+		} else {
+			return types.Vhost{}, err
+		}
 	}
 
 	return v, nil
@@ -69,5 +84,34 @@ func (s *defaultService) PutVhost(ctx context.Context, id uint, v types.Vhost) (
 }
 
 func (s *defaultService) DeleteVhost(ctx context.Context, id uint) error {
-	panic("implement me")
+	db := s.db.BeginTx(ctx, nil)
+	if db.Error != nil {
+		return db.Error
+	}
+
+	var v types.Vhost
+	err := db.Preload("Cert").Find(&v, id).Error
+	if err != nil {
+		db.Rollback()
+		if gorm.IsRecordNotFoundError(err) {
+			return ErrNotFound
+		} else {
+			return err
+		}
+	}
+
+	if err := db.Delete(&v.Cert).Error; err != nil {
+		db.Rollback()
+		return err
+	}
+
+	if err := db.Delete(&v).Error; err != nil {
+		db.Rollback()
+		return err
+	}
+
+	s.vault.Remove(v.FQDN)
+
+	db.Commit()
+	return nil
 }

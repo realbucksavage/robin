@@ -1,6 +1,7 @@
 package vhosts
 
 import (
+	"fmt"
 	"github.com/realbucksavage/robin/pkg/log"
 	"net/http"
 	"net/http/httputil"
@@ -18,6 +19,13 @@ func reverseProxy(backend string) (*httputil.ReverseProxy, error) {
 	return &httputil.ReverseProxy{
 		Director: defaultDirectorFunc(origin),
 		ErrorLog: log.StdLogger,
+		ErrorHandler: func(w http.ResponseWriter, e *http.Request, err error) {
+			log.L.Warningf("Cannot reach backend %s: %s", backend, err)
+
+			w.WriteHeader(http.StatusBadGateway)
+			response := fmt.Sprintf(`<h1>Bad Gateway</h1><br><pre><code>%s</code></pre><hr>Robin v1.0`, err)
+			w.Write([]byte(response))
+		},
 	}, nil
 }
 

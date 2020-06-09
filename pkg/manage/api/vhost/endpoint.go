@@ -8,8 +8,10 @@ import (
 )
 
 type Endpoints struct {
+	ListVhostsEndpoint  endpoint.Endpoint
 	GetVhostEndpoint    endpoint.Endpoint
 	CreateVhostEndpoint endpoint.Endpoint
+	DeleteVhostEndpoint endpoint.Endpoint
 }
 
 type getVhostRequest struct {
@@ -26,8 +28,27 @@ type createVhostRequest struct {
 func MakeEndpoint(s Service) Endpoints {
 
 	return Endpoints{
+		ListVhostsEndpoint:  makeListVhostsEndpoint(s),
 		GetVhostEndpoint:    makeGetVhostEndpoint(s),
 		CreateVhostEndpoint: makePostVhostEndpoint(s),
+		DeleteVhostEndpoint: makeDeleteVhostEndpoiint(s),
+	}
+}
+
+func makeListVhostsEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		if v, err := s.ListVhosts(ctx); err != nil {
+			return nil, err
+		} else {
+			return v, nil
+		}
+	}
+}
+
+func makeDeleteVhostEndpoiint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(getVhostRequest)
+		return nil, s.DeleteVhost(ctx, req.ID)
 	}
 }
 
