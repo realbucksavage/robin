@@ -2,6 +2,8 @@ package vhosts
 
 import (
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"github.com/realbucksavage/robin/pkg/database"
 	"github.com/realbucksavage/robin/pkg/log"
@@ -26,15 +28,24 @@ func (v *defaultVault) Get(host string) (Record, bool) {
 func (v *defaultVault) Put(host string, h H) error {
 	host = sanitize(host)
 
+	block, _ := pem.Decode(h.X509Cert)
+	if block == nil {
+		return fmt.Errorf("cannot parse block")
+	}
+
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return fmt.Errorf("certificate parse error: %s", err)
+	}
+
+	if err := cert.VerifyHostname(host); err != nil {
+		return fmt.Errorf("verify hostname: %s", err)
+	}
+
 	pair, err := tls.X509KeyPair(h.X509Cert, h.PrivateKey)
 	if err != nil {
 		return fmt.Errorf("invalid keypair: %v", err)
 	}
-
-	// TODO: Hostname validation
-	//if err := certificate.VerifyHostname(host); err != nil {
-	//	return fmt.Errorf("verify hostname %v: %v", host, err)
-	//}
 
 	rp, err := reverseProxy(h.Origin)
 	if err != nil {

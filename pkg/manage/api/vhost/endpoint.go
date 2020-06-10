@@ -48,7 +48,13 @@ func makeListVhostsEndpoint(s Service) endpoint.Endpoint {
 func makeDeleteVhostEndpoiint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(getVhostRequest)
-		return nil, s.DeleteVhost(ctx, req.ID)
+		if err := s.DeleteVhost(ctx, req.ID); err != nil {
+			return nil, err
+		} else {
+			return map[string]interface{}{
+				"success": true,
+			}, nil
+		}
 	}
 }
 
