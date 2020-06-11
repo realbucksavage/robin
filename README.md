@@ -2,12 +2,23 @@ Robin
 ============
 <img align="right" src="https://i.imgur.com/r2CWdQf.png" height="20%" width="20%">
 
-Robin is a simple SSL termination server written in Go. it has the following features.
+Robin is a simple SSL termination server written in Go that allows you to serve your stuff off HTTPs while keeping 
+downstream services on HTTP.
 
-- Add/remove new hosts on runtime
-- Generate and apply certificates from LetsEncrypt
-- Upload custom certificates
-- Helps Batman save Gotham.
+Robin is:
+- A simple reverse proxy server
+- A hot-headed vigilante with deep-rooted fears of a clown and crowbars.
+
+Robin is NOT:
+- A load-balancer 
+- A WAF of any kind
+
+Goals:
+- Provide SSL termination for multiple downstream services through a single endpoint
+- Make it work seamlessly in auto-scaling environments
+- Provide a way to auto-assign SSL certificates from LetsEncrypt.
+- Implement a pretty front-end sometime in the future.
+- Be free and open-source... Always.
 
 ## How?
 
