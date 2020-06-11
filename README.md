@@ -16,14 +16,84 @@ Robin is NOT:
 Goals:
 - Provide SSL termination for multiple downstream services through a single endpoint
 - Make it work seamlessly in auto-scaling environments
-- Provide a way to auto-assign SSL certificates from LetsEncrypt.
-- Implement a pretty front-end sometime in the future.
+- Provide a way to auto-assign SSL certificates from LetsEncrypt
+- Somehow make it viable to use in production
 - Be free and open-source... Always.
+
+Open TODOS:
+- Don't half-ass the API
+- Do better logging and error-handling
+- Implement a pretty front-end sometime in the future
 
 ## How?
 
 Edit `robinconfig.yaml` file to your liking and then `docker-compose build && docker-compose up`.
 When running with compose, the traffic port and management port listens on 443 (HTTPS) and 8089 (HTTP) respectively.
+An easy to use REST API is exposed under the management interface with these functions:
+
+#### `GET /api/vhosts/` 
+Lists configured hosts
+
+Response:
+```json
+[
+    {
+        "id": 1,
+        "created_at": "2020-06-10T18:23:39Z",
+        "updated_at": "2020-06-10T18:23:39Z",
+        "fqdn": "https://archlinux.localdomain",
+        "origin": "http://localhost:8081",
+        "certificate": {
+            "id": 0,
+            "created_at": "0001-01-01T00:00:00Z",
+            "updated_at": "0001-01-01T00:00:00Z",
+            "rsa_key": null,
+            "certificate": null,
+            "ca_chain": null
+        }
+    }
+]
+```
+
+#### `GET /api/vhosts/{id}`
+Gets a single configured host
+
+Response:
+```json
+{
+    "id": 1,
+    "created_at": "2020-06-10T18:23:39Z",
+    "updated_at": "2020-06-10T18:23:39Z",
+    "fqdn": "https://archlinux.localdomain",
+    "origin": "http://localhost:8081",
+    "certificate": {
+        "id": 1,
+        "created_at": "0001-01-01T00:00:00Z",
+        "updated_at": "0001-01-01T00:00:00Z",
+        "rsa_key": "-----BEGIN PRIVATE KEY----- ......",
+        "certificate": "-----BEGIN CERTIFICATE----- ......",
+        "ca_chain": null
+    }
+}
+```
+
+#### `POST /api/vhosts/`
+Creates a new host entry
+
+Request:
+```json
+{
+  "fqdn": "https://archlinux.localdomain",
+  "origin": "http://someserver.com:8081",
+  "cert": "-----BEGIN CERTIFICATE----- ......",
+  "rsa": "-----BEGIN PRIVATE KEY----- ......"
+}
+```
+
+Response: *same as get single host*
+
+#### `DELETE /api/vhosts/{id}`
+Deletes a host entry
 
 ### Command Line Args
 
