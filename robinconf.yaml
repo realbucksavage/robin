@@ -5,7 +5,6 @@ management:
   bind: :8089
   auth:
     user: robin
-    pass: robin
 
 database:
   #  log_sql: true

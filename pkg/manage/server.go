@@ -3,6 +3,7 @@ package manage
 import (
 	"context"
 	"github.com/realbucksavage/robin/pkg/vhosts"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -24,7 +25,20 @@ func (s *Server) Start() {
 		bindAddr = defaultBindAddr
 	}
 
-	handler, err := newHandler(s.VHostVault, s.Database)
+	auth := s.Config.Auth
+	if auth.Username == "" {
+		log.L.Infof("Using the default username (%s) for management API", defaultUsername)
+		auth.Username = defaultUsername
+	}
+
+	if auth.Password == "" {
+		p := randomPassword(10)
+
+		log.L.Infof("Using a generated password (%s) for management API", p)
+		auth.Password = p
+	}
+
+	handler, err := newHandler(s.VHostVault, s.Database, s.Config.Auth)
 	if err != nil {
 		log.L.Fatalf("create handler: %s", err)
 	}
@@ -52,4 +66,15 @@ func gracefulShutdown(server *http.Server, shutdown chan bool, done func()) {
 
 	log.L.Info("Management interface closed.")
 	done()
+}
+
+func randomPassword(l int) string {
+	charset := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+	b := make([]rune, l)
+
+	for i := range b {
+		b[i] = charset[rand.Intn(len(charset))]
+	}
+
+	return string(b)
 }

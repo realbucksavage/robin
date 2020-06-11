@@ -68,11 +68,11 @@ func decodePostVhost(_ context.Context, r *http.Request) (interface{}, error) {
 	return req, nil
 }
 
-type errorer interface {
-	error() error
-}
-
 func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	type errorer interface {
+		error() error
+	}
+
 	if e, ok := response.(errorer); ok && e.error() != nil {
 		encodeError(ctx, e.error(), w)
 		return nil
@@ -98,8 +98,6 @@ func codeFrom(err error) int {
 	switch err {
 	case ErrNotFound:
 		return http.StatusNotFound
-	case ErrAlreadyExists:
-		return http.StatusConflict
 	default:
 		return http.StatusInternalServerError
 	}
