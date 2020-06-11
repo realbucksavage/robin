@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	ErrNotFound      = errors.New("not found")
+	ErrNotFound = errors.New("not found")
 )
 
 type Service interface {
@@ -79,7 +79,7 @@ func (s *defaultService) PostVhost(ctx context.Context, v types.Vhost) (types.Vh
 }
 
 func (s *defaultService) PutVhost(ctx context.Context, id uint, v types.Vhost) (types.Vhost, error) {
-	panic("implement me")
+	return types.Vhost{}, errors.New("implement me")
 }
 
 func (s *defaultService) DeleteVhost(ctx context.Context, id uint) error {
