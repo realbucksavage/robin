@@ -29,6 +29,9 @@ Open TODOS:
 
 Edit `robinconfig.yaml` file to your liking and then `docker-compose build && docker-compose up`.
 When running with compose, the traffic port and management port listens on 443 (HTTPS) and 8089 (HTTP) respectively.
+You can map your DNS entries to the public address of the server running Robin. When an HTTPs resources is accessed,
+Robin chooses an appropriate downstream server based on the hostname and routes to it.
+
 An easy to use REST API is exposed under the management interface with these functions:
 
 #### `GET /api/vhosts/` 
@@ -94,6 +97,8 @@ Response: *same as get single host*
 
 #### `DELETE /api/vhosts/{id}`
 Deletes a host entry
+
+> The management API uses basic authentication from the credentials configured in `robinconf.yaml`
 
 ### Command Line Args
 
