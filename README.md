@@ -9,18 +9,21 @@ Robin is:
 - A simple reverse proxy server
 - A hot-headed vigilante with deep-rooted fears of a clown and crowbars.
 
-Robin is NOT:
-- A load-balancer 
-- A WAF of any kind
-
 Goals:
-- Provide SSL termination for multiple downstream services through a single endpoint
-- Make it work seamlessly in auto-scaling environments
-- Provide a way to auto-assign SSL certificates from LetsEncrypt
-- Somehow make it viable to use in production
-- Be free and open-source... Always.
+- [x] Provide SSL termination for multiple downstream services through a single endpoint
+- [x] Provide an easy to use management API to control downstream services
+- [ ] Make it work seamlessly in auto-scaling environments
+- [ ] Provide a way to auto-assign SSL certificates from LetsEncrypt
+- [ ] Somehow make it viable to use in production
+- [x] Be free and open-source... Always.
+- Be a community-driven project.
 
-Open TODOS:
+Non-goals:
+- Being a load balancer
+- Being a WAF
+- Being a certificate management service
+
+Open TODOs:
 - Don't half-ass the API
 - Do better logging and error-handling
 - Implement a pretty front-end sometime in the future
