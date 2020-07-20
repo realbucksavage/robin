@@ -1,11 +1,13 @@
 package manage
 
 import (
+	"net/http"
+
+	"github.com/go-kit/kit/auth/basic"
 	"github.com/gorilla/mux"
 	"github.com/realbucksavage/robin/pkg/database"
 	"github.com/realbucksavage/robin/pkg/manage/api/vhost"
 	"github.com/realbucksavage/robin/pkg/vhosts"
-	"net/http"
 )
 
 type apiHandler struct {
@@ -18,10 +20,11 @@ func newHandler(store vhosts.Vault, conn *database.Connection, config Authentica
 		return nil, err
 	}
 	r := mux.NewRouter()
-	r.Use(authenticationMiddleware(config))
+
+	mw := basic.AuthMiddleware(config.Username, config.Password, "robin")
 	vh := r.PathPrefix("/api/vhosts").Subrouter()
 	{
-		vhost.MakeRouter(vh, vhost.NewService(db, store))
+		vhost.MakeRouter(vh, vhost.NewService(db, store), mw)
 	}
 
 	return &apiHandler{mux: r}, nil
@@ -29,23 +32,4 @@ func newHandler(store vhosts.Vault, conn *database.Connection, config Authentica
 
 func (a *apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	a.mux.ServeHTTP(w, r)
-}
-
-func authenticationMiddleware(config AuthenticationConfig) mux.MiddlewareFunc {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			auth, password, ok := r.BasicAuth()
-			if !ok {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-
-			if auth != config.Username && password != config.Password {
-				w.WriteHeader(http.StatusForbidden)
-				return
-			}
-
-			next.ServeHTTP(w, r)
-		})
-	}
 }
