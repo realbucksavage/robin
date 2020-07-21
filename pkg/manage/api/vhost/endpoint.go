@@ -2,6 +2,7 @@ package vhost
 
 import (
 	"context"
+
 	"github.com/go-kit/kit/endpoint"
 	"github.com/realbucksavage/robin/pkg/types"
 	"gopkg.in/go-playground/validator.v8"

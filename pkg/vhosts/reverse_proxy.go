@@ -2,10 +2,11 @@ package vhosts
 
 import (
 	"fmt"
-	"github.com/realbucksavage/robin/pkg/log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/realbucksavage/robin/pkg/log"
 )
 
 func reverseProxy(backend string) (*httputil.ReverseProxy, error) {

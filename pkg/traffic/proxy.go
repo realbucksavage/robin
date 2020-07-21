@@ -2,9 +2,10 @@ package traffic
 
 import (
 	"fmt"
-	"github.com/realbucksavage/robin/pkg/vhosts"
 	"net/http"
 	"strings"
+
+	"github.com/realbucksavage/robin/pkg/vhosts"
 )
 
 func NewProxy(store vhosts.Vault) (http.Handler, error) {
@@ -21,7 +22,6 @@ func NewProxy(store vhosts.Vault) (http.Handler, error) {
 		vhost.Backend.ServeHTTP(w, r)
 	}), nil
 }
-
 
 func statusText(status int) []byte {
 	t := fmt.Sprintf("<h1>%s</h1><hr>Status code %d", http.StatusText(status), status)

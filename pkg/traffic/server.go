@@ -3,9 +3,10 @@ package traffic
 import (
 	"context"
 	"crypto/tls"
-	"github.com/realbucksavage/robin/pkg/vhosts"
 	"net/http"
 	"time"
+
+	"github.com/realbucksavage/robin/pkg/vhosts"
 
 	"github.com/realbucksavage/robin/pkg/log"
 )

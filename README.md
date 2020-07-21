@@ -16,7 +16,7 @@ Goals:
 - [ ] Provide a way to auto-assign SSL certificates from LetsEncrypt
 - [ ] Somehow make it viable to use in production
 - [x] Be free and open-source... Always.
-- Be a community-driven project.
+- [x] Be a community-driven project.
 
 Non-goals:
 - Being a load balancer
@@ -27,7 +27,13 @@ Open TODOs:
 - Don't half-ass the API
 - Do better logging and error-handling
 - Implement a pretty front-end sometime in the future
+- Add tests for all possible packages
 
+## Proof of Concept
+
+```shell
+$ go test ./.. -v
+```
 ## How?
 
 Edit `robinconfig.yaml` file to your liking and then `docker-compose build && docker-compose up`.

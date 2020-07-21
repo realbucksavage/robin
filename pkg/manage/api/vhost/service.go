@@ -3,6 +3,7 @@ package vhost
 import (
 	"context"
 	"errors"
+
 	"github.com/jinzhu/gorm"
 	"github.com/realbucksavage/robin/pkg/types"
 	"github.com/realbucksavage/robin/pkg/vhosts"

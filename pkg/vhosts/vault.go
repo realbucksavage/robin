@@ -5,11 +5,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"net/url"
+	"sync"
+
 	"github.com/realbucksavage/robin/pkg/database"
 	"github.com/realbucksavage/robin/pkg/log"
 	"github.com/realbucksavage/robin/pkg/types"
-	"net/url"
-	"sync"
 )
 
 type defaultVault struct {

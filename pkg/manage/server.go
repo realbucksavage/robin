@@ -2,10 +2,11 @@ package manage
 
 import (
 	"context"
-	"github.com/realbucksavage/robin/pkg/vhosts"
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/realbucksavage/robin/pkg/vhosts"
 
 	"github.com/realbucksavage/robin/pkg/database"
 	"github.com/realbucksavage/robin/pkg/log"

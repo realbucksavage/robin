@@ -3,6 +3,7 @@ package traffic
 import (
 	"crypto/tls"
 	"fmt"
+
 	"github.com/realbucksavage/robin/pkg/log"
 	"github.com/realbucksavage/robin/pkg/vhosts"
 )

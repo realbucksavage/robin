@@ -1,11 +1,12 @@
 package service
 
 import (
-	"github.com/realbucksavage/robin/pkg/vhosts"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/realbucksavage/robin/pkg/vhosts"
 
 	"github.com/realbucksavage/robin/pkg/database"
 	"github.com/realbucksavage/robin/pkg/log"
