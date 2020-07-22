@@ -28,6 +28,7 @@ Open TODOs:
 - Do better logging and error-handling
 - Implement a pretty front-end sometime in the future
 - Add tests for all possible packages
+- Support HTTP to HTTPs redirection
 
 ## Proof of Concept
 
