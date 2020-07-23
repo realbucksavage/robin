@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 
 	"github.com/realbucksavage/robin/pkg/vhosts"
@@ -49,15 +50,18 @@ func TestTlsConfig(t *testing.T) {
 	}
 
 	shutdown := make(chan bool)
+	var wg sync.WaitGroup
+
 	server := Server{
 		Config: Config{
 			BindAddr: ":8443",
 		},
 		VHostVault:   v,
-		DoneFunc:     func() {},
+		DoneFunc:     wg.Done,
 		ShutdownChan: shutdown,
 	}
 
+	wg.Add(1)
 	go server.Start()
 
 	client := &http.Client{
@@ -86,6 +90,9 @@ func TestTlsConfig(t *testing.T) {
 	}
 
 	close(shutdown)
+	wg.Wait()
+
+	t.Log("Test passed")
 }
 
 func dummyHandler() http.HandlerFunc {

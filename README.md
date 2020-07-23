@@ -33,7 +33,7 @@ Open TODOs:
 ## Proof of Concept
 
 ```shell
-$ go test ./... -v
+$ go test ./pkg/traffic -v
 ```
 ## How?
 
