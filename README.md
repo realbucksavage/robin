@@ -35,6 +35,9 @@ Open TODOs:
 ```shell
 $ go test ./pkg/traffic -v
 ```
+
+[![asciicast](https://asciinema.org/a/350231.svg)](https://asciinema.org/a/350231)
+
 ## How?
 
 Edit `robinconfig.yaml` file to your liking and then `docker-compose build && docker-compose up`.
